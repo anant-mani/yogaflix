@@ -89,6 +89,7 @@
   .fig .ink{stroke:var(--accent);stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:.95;}
   .fig .ink2{stroke:var(--accent);stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:.4;}
   .fig .mat{stroke:var(--mat);stroke-width:3.6;stroke-linecap:round;fill:none;opacity:.85;}
+  .fig .motion{stroke:var(--accent-2);stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round;}
 
   .pose-name{text-align:center;margin-top:12px;z-index:1;}
   .pose-name .en{font-size:23px;font-weight:800;letter-spacing:-.01em;}
@@ -330,6 +331,32 @@ const POSES = [
     cue:'Return to a comfortable seat, hands together at the heart. Rest here and let the breath be quiet.',
     front:{head:[50,32],neck:[50,44],shL:[41,50],shR:[59,50],elL:[40,62],elR:[60,62],haL:[48,58],haR:[52,58],hipC:[50,90],hipL:[43,91],hipR:[57,91],knL:[30,95],knR:[70,95],ftL:[46,97],ftR:[54,97]},
     side:{head:[54,32],neck:[51,44],sh:[49,50],el:[49,62],ha:[56,56],hip:[49,90],kn:[66,94],ft:[40,93]} },
+
+  // --- Warm-up mobility drills (done in Staff Pose; the animated arrow shows the movement) ---
+  { id:'ankleFB', name:'Ankle Point & Flex', sk:'Feet forward & back', cat:'mobility', mob:true, motion:'updown',
+    cue:'Legs straight, palms by your hips, sit tall. Point the toes far away, then flex them back toward you — slow, with the breath.',
+    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[42,62],elR:[58,62],haL:[44,72],haR:[56,72],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[46,100],knR:[54,100],ftL:[46,110],ftR:[54,110]},
+    side:{head:[50,30],neck:[50,42],sh:[50,48],el:[51,62],ha:[52,74],hip:[50,88],kn:[72,92],ft:[92,92]} },
+
+  { id:'ankleLR', name:'Ankle Sway', sk:'Feet side to side', cat:'mobility', mob:true, motion:'leftright',
+    cue:'Keeping the legs still, tilt both feet to the left, then to the right — like slow windscreen wipers.',
+    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[42,62],elR:[58,62],haL:[44,72],haR:[56,72],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[46,100],knR:[54,100],ftL:[46,110],ftR:[54,110]},
+    side:{head:[50,30],neck:[50,42],sh:[50,48],el:[51,62],ha:[52,74],hip:[50,88],kn:[72,92],ft:[92,92]} },
+
+  { id:'ankleRot', name:'Ankle Circles', sk:'Rotate both ways', cat:'mobility', mob:true, motion:'circle',
+    cue:'Draw slow circles with the feet — several times clockwise, then reverse and go anti-clockwise.',
+    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[42,62],elR:[58,62],haL:[44,72],haR:[56,72],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[46,100],knR:[54,100],ftL:[46,110],ftR:[54,110]},
+    side:{head:[50,30],neck:[50,42],sh:[50,48],el:[51,62],ha:[52,74],hip:[50,88],kn:[72,92],ft:[92,92]} },
+
+  { id:'kneehug', name:'Knee Hug', sk:'Pawanmuktasana', cat:'warmup',
+    cue:'From the stretched-leg seat, hug one knee into the chest with both arms. Sit tall and breathe, then release and switch to the other leg.',
+    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[40,58],elR:[60,58],haL:[47,64],haR:[53,64],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[42,66],knR:[58,100],ftL:[46,78],ftR:[62,110]},
+    side:{head:[50,30],neck:[50,42],sh:[50,48],el:[54,60],ha:[62,64],hip:[50,88],kn:[66,64],ft:[52,82]} },
+
+  { id:'reachup', name:'Kneeling Reach Up', sk:'Parvatasana', cat:'flow',
+    cue:'Kneeling tall, interlace the fingers and turn the palms to the sky. Press up, lengthen the spine, gaze forward.',
+    front:{head:[50,30],neck:[50,42],shL:[42,47],shR:[58,47],elL:[45,31],elR:[55,31],haL:[49,17],haR:[51,17],hipC:[50,84],hipL:[44,85],hipR:[56,85],knL:[40,100],knR:[60,100],ftL:[44,104],ftR:[56,104]},
+    side:{head:[52,30],neck:[50,42],sh:[49,47],el:[51,31],ha:[52,17],hip:[49,84],kn:[62,100],ft:[45,104]} },
 ];
 
 /* =========================================================
@@ -386,36 +413,86 @@ function figureSVG(pose, view){
   const mat=[['mat',sketchSeg(8,114,92,114,rnd)],['mat',sketchSeg(8,114.7,92,114.4,rnd)]];
   const fid='rgh'+seed;
   const body=[...mat,...paths].map(([c,d])=>`<path class="${c}" d="${d}"/>`).join('');
+  let glyph='';
+  if(pose.motion){
+    const ax = view==='front' ? (j.ftL[0]+j.ftR[0])/2 : j.ft[0];
+    const ay = (view==='front' ? (j.ftL[1]+j.ftR[1])/2 : j.ft[1]) - 3;
+    glyph = motionGlyph(pose.motion, ax, ay);
+  }
   return `<svg viewBox="-6 -6 112 134" xmlns="http://www.w3.org/2000/svg">`+
     `<defs><filter id="${fid}" x="-25%" y="-25%" width="150%" height="150%">`+
       `<feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="${seed%97}" result="n"/>`+
       `<feDisplacementMap in="SourceGraphic" in2="n" scale="2.1" xChannelSelector="R" yChannelSelector="G"/>`+
     `</filter></defs>`+
-    `<g filter="url(#${fid})">${body}</g></svg>`;
+    `<g filter="url(#${fid})">${body}</g>${glyph}</svg>`;
+}
+
+/* A small animated arrow that shows an active movement (used by the
+   mobility drills). Kept outside the sketch filter so it reads crisply. */
+function motionGlyph(type, cx, cy){
+  const a=7;
+  if(type==='updown'){
+    return `<g class="motion"><g>`+
+      `<line x1="${cx}" y1="${cy-a}" x2="${cx}" y2="${cy+a}"/>`+
+      `<polyline points="${cx-2.6},${cy-a+3} ${cx},${cy-a} ${cx+2.6},${cy-a+3}"/>`+
+      `<polyline points="${cx-2.6},${cy+a-3} ${cx},${cy+a} ${cx+2.6},${cy+a-3}"/>`+
+      `<animateTransform attributeName="transform" type="translate" values="0 -1.6;0 1.6;0 -1.6" dur="1.6s" repeatCount="indefinite"/>`+
+      `</g></g>`;
+  }
+  if(type==='leftright'){
+    return `<g class="motion"><g>`+
+      `<line x1="${cx-a}" y1="${cy}" x2="${cx+a}" y2="${cy}"/>`+
+      `<polyline points="${cx-a+3},${cy-2.6} ${cx-a},${cy} ${cx-a+3},${cy+2.6}"/>`+
+      `<polyline points="${cx+a-3},${cy-2.6} ${cx+a},${cy} ${cx+a-3},${cy+2.6}"/>`+
+      `<animateTransform attributeName="transform" type="translate" values="-1.6 0;1.6 0;-1.6 0" dur="1.6s" repeatCount="indefinite"/>`+
+      `</g></g>`;
+  }
+  // circle (rotation)
+  const r=6;
+  return `<g class="motion"><g>`+
+    `<circle cx="${cx}" cy="${cy}" r="${r}" stroke-dasharray="30 7"/>`+
+    `<polyline points="${cx-2.6},${cy-r-2.2} ${cx+0.6},${cy-r} ${cx-1.8},${cy-r+2.8}"/>`+
+    `<animateTransform attributeName="transform" type="rotate" from="0 ${cx} ${cy}" to="360 ${cx} ${cy}" dur="3s" repeatCount="indefinite"/>`+
+    `</g></g>`;
 }
 
 /* =========================================================
    Session builder — randomized warm-up → flow → rest arc
 ========================================================= */
-const HOLD=150, DURATIONS=[10,20,30,40];
-const poseCountFor = min => Math.max(3, Math.round(min*60/HOLD));
+const HOLD=150, DRILL=50, DURATIONS=[10,20,30,40];
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const k=Math.floor(Math.random()*(i+1));[a[i],a[k]]=[a[k],a[i]];}return a;}
 const byCat = c => POSES.filter(p=>p.cat===c);
 
+// Session plan: a short warm-up of mobility drills, then a randomized
+// warm-up→flow arc, closing on a rest pose.
+const drillCount = min => min<=10 ? 2 : 3;
+function plan(min){
+  const k=drillCount(min);
+  const rem=min*60 - k*DRILL;
+  const n2=Math.max(3, Math.round(rem/HOLD));      // warm-up + flows + rest
+  return { k, n2, per2:Math.round(rem/n2), total:k+n2 };
+}
+const poseCountFor = min => plan(min).total;
+
 function buildSequence(min){
-  const n=poseCountFor(min), warm=byCat('warmup'), flow=byCat('flow'), rest=byCat('rest');
-  const seq=[shuffle(warm)[0]];
-  const mid=n-2;
-  let pool=shuffle(flow);
-  if(mid>=5) pool=[shuffle(warm)[0],...pool];
-  for(let i=0;i<mid;i++){
-    if(!pool.length) pool=shuffle(flow);
+  const {k,n2,per2}=plan(min);
+  const drills=shuffle(POSES.filter(p=>p.mob)).slice(0,k);
+  const warmPool=POSES.filter(p=>p.cat==='warmup' && p.id!=='staff'); // staff is covered by the drills
+  const warm=shuffle(warmPool)[0];
+  const flowPool=byCat('flow'), rest=shuffle(byCat('rest'))[0];
+  const flows=[]; let pool=shuffle(flowPool);
+  for(let i=0;i<n2-2;i++){
+    if(!pool.length) pool=shuffle(flowPool);
     let c=pool.shift();
-    if(seq.length && seq[seq.length-1].id===c.id && pool.length){pool.push(c);c=pool.shift();}
-    seq.push(c);
+    if(flows.length && flows[flows.length-1].id===c.id && pool.length){pool.push(c);c=pool.shift();}
+    flows.push(c);
   }
-  seq.push(shuffle(rest)[0]);
-  return {seq, per:Math.round(min*60/n), min};
+  const seq=[];
+  drills.forEach(p=>seq.push({pose:p, secs:DRILL}));
+  seq.push({pose:warm, secs:per2});
+  flows.forEach(p=>seq.push({pose:p, secs:per2}));
+  seq.push({pose:rest, secs:per2});
+  return { seq, min };
 }
 
 /* =========================================================
@@ -530,7 +607,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 /* =========================================================
    Session runtime
 ========================================================= */
-let S=null, idx=0, phase='hold', endAt=0, pausedRem=null, ticker=null;
+let S=null, idx=0, phase='hold', endAt=0, pausedRem=null, ticker=null, curSecs=0;
 const TRANS=6, RING_LEN=2*Math.PI*54;
 
 function begin(){
@@ -555,13 +632,13 @@ function renderPose(p){
   $('#poseCount').textContent=`Pose ${idx+1} / ${S.seq.length}`;
   paintDots();
 }
-function startPose(i){ idx=i; phase='hold'; renderPose(S.seq[i]); endAt=Date.now()+S.per*1000; $('#breath').style.animationPlayState='running'; }
-function startTransition(){ phase='transition'; const next=S.seq[idx+1]; bell(3,852); $('#cue').textContent=`Ease gently into ${next.name}…`; $('#cue').classList.add('trans'); endAt=Date.now()+TRANS*1000; }
+function startPose(i){ idx=i; phase='hold'; const it=S.seq[i]; curSecs=it.secs; renderPose(it.pose); endAt=Date.now()+it.secs*1000; $('#breath').style.animationPlayState='running'; }
+function startTransition(){ phase='transition'; const next=S.seq[idx+1].pose; bell(3,852); $('#cue').textContent=`Ease gently into ${next.name}…`; $('#cue').classList.add('trans'); endAt=Date.now()+TRANS*1000; }
 
 function loop(){ clearInterval(ticker); ticker=setInterval(tick,200); tick(); }
 function tick(){
   if(pausedRem!==null) return;
-  const remMs=endAt-Date.now(), total=(phase==='hold'?S.per:TRANS)*1000, frac=Math.max(0,Math.min(1,remMs/total));
+  const remMs=endAt-Date.now(), total=(phase==='hold'?curSecs:TRANS)*1000, frac=Math.max(0,Math.min(1,remMs/total));
   if(phase==='hold'){
     $('#timerNum').textContent=fmt(Math.max(0,Math.ceil(remMs/1000)));
     $('#ringFg').style.strokeDasharray=RING_LEN;
