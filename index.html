@@ -83,7 +83,7 @@
   .breath{position:absolute;top:44%;left:50%;width:250px;height:250px;margin:-125px 0 0 -125px;border-radius:50%;background:radial-gradient(circle,rgba(240,201,135,.14),rgba(240,201,135,0) 68%);animation:breathe 11s ease-in-out infinite;pointer-events:none;z-index:0;}
   @keyframes breathe{0%,100%{transform:scale(.72);opacity:.55;}36%{transform:scale(1.06);opacity:1;}50%{transform:scale(1.06);opacity:1;}100%{transform:scale(.72);opacity:.55;}}
   .figs{display:flex;gap:6px;justify-content:center;align-items:flex-end;width:100%;z-index:1;}
-  .fig{flex:1;max-width:172px;text-align:center;}
+  .fig{flex:1;max-width:240px;text-align:center;}
   .fig svg{width:100%;height:auto;display:block;filter:drop-shadow(0 0 7px rgba(240,201,135,.22));}
   .fig .view{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:2px;}
   .fig .limb{stroke:var(--accent);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;fill:none;}
@@ -603,10 +603,11 @@ $('#homeBtn').onclick=()=>{ renderHome(); show('home'); };
 function buildDots(){ const d=$('#dots'); d.innerHTML=''; S.seq.forEach(()=>{const e=document.createElement('div');e.className='dot';d.appendChild(e);}); paintDots(); }
 function paintDots(){ [...$('#dots').children].forEach((e,i)=>{ e.className='dot'+(i<idx?' done':'')+(i===idx?' cur':''); }); }
 
+/* Single view per pose — whichever angle reads the pose most clearly */
+const BEST_VIEW={easy:'front',thunder:'side',sidebend:'front',staff:'side',butterfly:'front',twist:'front',cowface:'front',wideleg:'front',pigeon:'side',lunge:'side',catcow:'side',sphinx:'side',child:'side',meditate:'front',ankleFB:'side',ankleLR:'side',ankleRot:'side',kneehug:'front',reachup:'side'};
 function renderPose(p){
   $('#figs').innerHTML =
-    `<div class="fig">${figureSVG(p,'front')}<div class="view">Front</div></div>`+
-    `<div class="fig">${figureSVG(p,'side')}<div class="view">Side</div></div>`;
+    `<div class="fig">${figureSVG(p, BEST_VIEW[p.id]||'side')}</div>`;
   $('#poseEn').textContent=p.name; $('#poseSk').textContent=p.sk;
   $('#cue').textContent=p.cue; $('#cue').classList.remove('trans');
   $('#poseCount').textContent=`Pose ${idx+1} / ${S.seq.length}`;
