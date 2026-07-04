@@ -14,8 +14,9 @@ and watch.
 - **10 / 20 / 30 / 40-minute sessions** — pick how long you want to sit.
 - **Randomized warm-up → flow → rest arc** — a fresh sequence every time, but always
   eased in and out sensibly (never a deep stretch cold).
-- **Hand-drawn pose figures** — front + side views, sketched in code (no image files),
-  in an energy-friendly dark theme.
+- **Illustrated pose figures** — a consistent hand-illustrated character for every
+  pose (`art/`, sliced from a single AI-generated sheet), in an energy-friendly
+  dark theme.
 - **Soft synthesized bell** cues each transition — no audio files, works offline.
 - **Breathing pulse** and a screen **wake-lock** so your phone won't sleep on the mat.
 - **Local-only personalization** — after a few days of practice it invites you to add
@@ -23,8 +24,10 @@ and watch.
 
 ## Tech
 
-A single self-contained `index.html` — no build step, no dependencies, no backend.
-All poses, artwork, and audio are generated in the browser.
+One `index.html` plus a folder of pose illustrations (`art/*.webp`) — no build
+step, no dependencies, no backend. Sessions, audio, and UI are all generated in
+the browser. `poses-sheet.png` is the original artwork sheet the poses were
+sliced from.
 
 ## Run locally
 

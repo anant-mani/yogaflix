@@ -83,14 +83,10 @@
   .breath{position:absolute;top:44%;left:50%;width:250px;height:250px;margin:-125px 0 0 -125px;border-radius:50%;background:radial-gradient(circle,rgba(240,201,135,.14),rgba(240,201,135,0) 68%);animation:breathe 11s ease-in-out infinite;pointer-events:none;z-index:0;}
   @keyframes breathe{0%,100%{transform:scale(.72);opacity:.55;}36%{transform:scale(1.06);opacity:1;}50%{transform:scale(1.06);opacity:1;}100%{transform:scale(.72);opacity:.55;}}
   .figs{display:flex;gap:6px;justify-content:center;align-items:flex-end;width:100%;z-index:1;}
-  .fig{flex:1;max-width:240px;text-align:center;}
-  .fig svg{width:100%;height:auto;display:block;filter:drop-shadow(0 0 7px rgba(240,201,135,.22));}
-  .fig .view{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:2px;}
-  .fig .limb{stroke:var(--accent);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;fill:none;}
-  .fig .spine{stroke:var(--accent);stroke-width:9;stroke-linecap:round;fill:none;}
-  .fig .torso{fill:var(--accent);stroke:var(--accent);stroke-width:5;stroke-linejoin:round;}
-  .fig .headfill{fill:var(--accent);}
-  .fig .mat{stroke:var(--mat);stroke-width:3.6;stroke-linecap:round;fill:none;opacity:.85;}
+  .fig{flex:1;max-width:250px;text-align:center;position:relative;}
+  .fig img{width:100%;height:auto;display:block;filter:drop-shadow(0 4px 14px rgba(0,0,0,.45));}
+  .fig .matline{height:4px;border-radius:2px;background:var(--mat);opacity:.85;margin:0 6%;}
+  .fig .arrowov{position:absolute;width:42px;height:42px;right:4%;bottom:16%;}
   .fig .motion{stroke:var(--accent-2);stroke-width:2.1;fill:none;stroke-linecap:round;stroke-linejoin:round;}
 
   .pose-name{text-align:center;margin-top:12px;z-index:1;}
@@ -265,150 +261,73 @@
 ========================================================= */
 const POSES = [
   { id:'easy', name:'Easy Pose', sk:'Sukhasana', cat:'warmup',
-    cue:'Sit tall, shoulders soft. Breathe slowly in and out through the nose.',
-    front:{head:[50,30],neck:[50,42],shL:[41,48],shR:[59,48],elL:[35,60],elR:[65,60],haL:[42,70],haR:[58,70],hipC:[50,90],hipL:[43,91],hipR:[57,91],knL:[30,95],knR:[70,95],ftL:[46,97],ftR:[54,97]},
-    side:{head:[54,30],neck:[51,42],sh:[49,48],el:[50,62],ha:[60,70],hip:[49,90],kn:[66,94],ft:[40,93]} },
+    cue:'Sit tall, shoulders soft. Breathe slowly in and out through the nose.' },
 
   { id:'thunder', name:'Thunderbolt', sk:'Vajrasana', cat:'warmup',
-    cue:'Kneel and sit back on your heels. Lengthen the spine, hands resting on the thighs.',
-    front:{head:[50,26],neck:[50,38],shL:[41,44],shR:[59,44],elL:[40,58],elR:[60,58],haL:[44,66],haR:[56,66],hipC:[50,84],hipL:[44,85],hipR:[56,85],knL:[40,100],knR:[60,100],ftL:[44,104],ftR:[56,104]},
-    side:{head:[54,26],neck:[51,38],sh:[49,44],el:[50,58],ha:[55,66],hip:[49,84],kn:[62,100],ft:[45,104]} },
+    cue:'Kneel and sit back on your heels. Lengthen the spine, hands resting on the thighs.' },
 
   { id:'sidebend', name:'Seated Side Bend', sk:'Parsva Sukhasana', cat:'warmup',
-    cue:'Reach one arm up and over. Feel the side ribs open. Then switch sides.',
-    front:{head:[46,32],neck:[48,44],shL:[40,50],shR:[58,49],elL:[34,60],elR:[66,40],haL:[40,68],haR:[71,30],hipC:[50,90],hipL:[43,91],hipR:[57,91],knL:[30,95],knR:[70,95],ftL:[46,97],ftR:[54,97]},
-    side:{head:[52,32],neck:[50,44],sh:[48,50],el:[53,38],ha:[59,30],hip:[49,90],kn:[66,94],ft:[40,93]} },
+    cue:'Reach one arm up and over. Feel the side ribs open. Then switch sides.' },
 
   { id:'staff', name:'Staff Pose', sk:'Dandasana', cat:'warmup',
-    cue:'Legs straight ahead, feet flexed. Press the hands down and sit up bright and tall.',
-    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[42,62],elR:[58,62],haL:[44,72],haR:[56,72],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[46,100],knR:[54,100],ftL:[46,110],ftR:[54,110]},
-    side:{head:[50,30],neck:[50,42],sh:[50,48],el:[51,62],ha:[52,74],hip:[50,88],kn:[72,92],ft:[92,92]} },
+    cue:'Legs straight ahead, feet flexed. Press the hands down and sit up bright and tall.' },
 
   { id:'butterfly', name:'Butterfly', sk:'Baddha Konasana', cat:'flow',
-    cue:'Bring the soles of the feet together and let the knees soften down. Long, easy breaths.',
-    front:{head:[50,32],neck:[50,44],shL:[41,50],shR:[59,50],elL:[36,62],elR:[64,62],haL:[44,74],haR:[56,74],hipC:[50,90],hipL:[43,91],hipR:[57,91],knL:[28,98],knR:[72,98],ftL:[47,96],ftR:[53,96]},
-    side:{head:[54,32],neck:[51,44],sh:[49,50],el:[49,64],ha:[54,76],hip:[49,90],kn:[66,96],ft:[50,94]} },
+    cue:'Bring the soles of the feet together and let the knees soften down. Long, easy breaths.' },
 
   { id:'twist', name:'Seated Twist', sk:'Ardha Matsyendrasana', cat:'flow',
-    cue:'Inhale tall, exhale and twist gently from the belly. Hold, then unwind and switch sides.',
-    front:{head:[54,30],neck:[51,42],shL:[44,50],shR:[60,46],elL:[56,58],elR:[66,54],haL:[64,60],haR:[58,66],hipC:[50,90],hipL:[43,91],hipR:[57,91],knL:[34,96],knR:[64,94],ftL:[50,98],ftR:[44,92]},
-    side:{head:[56,30],neck:[52,42],sh:[50,48],el:[58,54],ha:[64,58],hip:[49,90],kn:[66,94],ft:[40,93]} },
+    cue:'Inhale tall, exhale and twist gently from the belly. Hold, then unwind and switch sides.' },
 
   { id:'cowface', name:'Cow-Face Arms', sk:'Gomukhasana', cat:'flow',
-    cue:'One arm reaches up and bends behind, the other comes from below. Reach to clasp — a strap is fine.',
-    front:{head:[50,32],neck:[50,44],shL:[42,50],shR:[58,50],elL:[40,40],elR:[60,66],haL:[48,52],haR:[52,58],hipC:[50,90],hipL:[43,91],hipR:[57,91],knL:[32,95],knR:[68,95],ftL:[48,97],ftR:[52,97]},
-    side:{head:[54,32],neck:[51,44],sh:[49,50],el:[50,38],ha:[50,52],hip:[49,90],kn:[66,94],ft:[40,93]} },
+    cue:'One arm reaches up and bends behind, the other comes from below. Reach to clasp — a strap is fine.' },
 
   { id:'wideleg', name:'Wide-Leg Seat', sk:'Upavistha Konasana', cat:'flow',
-    cue:'Open the legs wide, feet flexed. Lift the chest and keep the spine long and proud.',
-    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[40,60],elR:[60,60],haL:[40,70],haR:[60,70],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[30,100],knR:[70,100],ftL:[22,108],ftR:[78,108]},
-    side:{head:[50,30],neck:[50,42],sh:[50,48],el:[51,60],ha:[56,68],hip:[50,88],kn:[72,92],ft:[92,92]} },
+    cue:'Open the legs wide, feet flexed. Lift the chest and keep the spine long and proud.' },
 
   { id:'pigeon', name:'Pigeon Pose', sk:'Eka Pada Kapotasana', cat:'flow',
-    cue:'Front shin forward, back leg long behind you. Keep the chest lifted and open. Switch sides halfway.',
-    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[40,62],elR:[60,62],haL:[42,72],haR:[58,72],hipC:[50,86],hipL:[44,88],hipR:[58,86],knL:[34,94],knR:[66,92],ftL:[56,96],ftR:[80,98]},
-    side:{head:[52,30],neck:[50,42],sh:[49,48],el:[50,62],ha:[52,74],hip:[49,86],kn:[30,92],ft:[86,96]} },
+    cue:'Front shin forward, back leg long behind you. Keep the chest lifted and open. Switch sides halfway.' },
 
   { id:'lunge', name:'Low Lunge', sk:'Anjaneyasana', cat:'flow',
-    cue:'Back knee down, sink the hips forward. Lift the chest, gaze soft and ahead. Switch legs halfway.',
-    front:{head:[50,24],neck:[50,36],shL:[42,42],shR:[58,42],elL:[40,54],elR:[60,54],haL:[42,50],haR:[58,50],hipC:[50,74],hipL:[44,76],hipR:[56,74],knL:[40,96],knR:[70,90],ftL:[40,106],ftR:[82,98]},
-    side:{head:[52,24],neck:[50,36],sh:[49,42],el:[50,54],ha:[52,46],hip:[49,74],kn:[30,100],ft:[84,96]} },
+    cue:'Back knee down, sink the hips forward. Lift the chest, gaze soft and ahead. Switch legs halfway.' },
 
   { id:'catcow', name:'Cat–Cow', sk:'Marjaryasana–Bitilasana', cat:'flow',
-    cue:'On hands and knees. Inhale to arch and lift the gaze, exhale to round. Flow with the breath.',
-    front:{head:[50,60],neck:[50,64],shL:[40,66],shR:[60,66],elL:[38,86],elR:[62,86],haL:[37,104],haR:[63,104],hipC:[50,72],hipL:[43,74],hipR:[57,74],knL:[40,100],knR:[60,100],ftL:[40,108],ftR:[60,108]},
-    side:{head:[82,54],neck:[74,60],sh:[70,64],el:[70,88],ha:[70,106],hip:[34,66],kn:[34,90],ft:[28,106]} },
+    cue:'On hands and knees. Inhale to arch and lift the gaze, exhale to round. Flow with the breath.' },
 
   { id:'sphinx', name:'Sphinx Pose', sk:'Salamba Bhujangasana', cat:'rest',
-    cue:'Lie on your belly, forearms down. Lift the chest and settle your gaze right on the screen.',
-    front:{head:[50,40],neck:[50,50],shL:[40,56],shR:[60,56],elL:[36,70],elR:[64,70],haL:[40,86],haR:[60,86],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[44,102],knR:[56,102],ftL:[44,110],ftR:[56,110]},
-    side:{head:[72,50],neck:[66,56],sh:[60,60],el:[64,78],ha:[72,80],hip:[30,86],kn:[18,90],ft:[8,90]} },
+    cue:'Lie on your belly, forearms down. Lift the chest and settle your gaze right on the screen.' },
 
   { id:'child', name:'Child’s Pose', sk:'Balasana', cat:'rest',
-    cue:'Knees wide, fold forward and let the forehead rest. Arms long. A moment to simply breathe.',
-    front:{head:[50,88],neck:[50,82],shL:[42,80],shR:[58,80],elL:[40,88],elR:[60,88],haL:[38,101],haR:[62,101],hipC:[50,92],hipL:[44,93],hipR:[56,93],knL:[42,102],knR:[58,102],ftL:[42,108],ftR:[58,108]},
-    side:{head:[26,92],neck:[34,86],sh:[40,84],el:[30,90],ha:[16,97],hip:[64,88],kn:[72,98],ft:[80,104]} },
+    cue:'Knees wide, fold forward and let the forehead rest. Arms long. A moment to simply breathe.' },
 
   { id:'meditate', name:'Meditation Seal', sk:'Anjali Mudra', cat:'rest',
-    cue:'Return to a comfortable seat, hands together at the heart. Rest here and let the breath be quiet.',
-    front:{head:[50,32],neck:[50,44],shL:[41,50],shR:[59,50],elL:[40,62],elR:[60,62],haL:[48,58],haR:[52,58],hipC:[50,90],hipL:[43,91],hipR:[57,91],knL:[30,95],knR:[70,95],ftL:[46,97],ftR:[54,97]},
-    side:{head:[54,32],neck:[51,44],sh:[49,50],el:[49,62],ha:[56,56],hip:[49,90],kn:[66,94],ft:[40,93]} },
+    cue:'Return to a comfortable seat, hands together at the heart. Rest here and let the breath be quiet.' },
 
   // --- Warm-up mobility drills (done in Staff Pose; the animated arrow shows the movement) ---
   { id:'ankleFB', name:'Ankle Point & Flex', sk:'Feet forward & back', cat:'mobility', mob:true, motion:'updown',
-    cue:'Legs straight, palms by your hips, sit tall. Point the toes far away, then flex them back toward you — slow, with the breath.',
-    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[42,62],elR:[58,62],haL:[44,72],haR:[56,72],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[46,100],knR:[54,100],ftL:[46,110],ftR:[54,110]},
-    side:{head:[50,30],neck:[50,42],sh:[50,48],el:[51,62],ha:[52,74],hip:[50,88],kn:[72,92],ft:[92,92]} },
+    cue:'Legs straight, palms by your hips, sit tall. Point the toes far away, then flex them back toward you — slow, with the breath.' },
 
   { id:'ankleLR', name:'Ankle Sway', sk:'Feet side to side', cat:'mobility', mob:true, motion:'leftright',
-    cue:'Keeping the legs still, tilt both feet to the left, then to the right — like slow windscreen wipers.',
-    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[42,62],elR:[58,62],haL:[44,72],haR:[56,72],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[46,100],knR:[54,100],ftL:[46,110],ftR:[54,110]},
-    side:{head:[50,30],neck:[50,42],sh:[50,48],el:[51,62],ha:[52,74],hip:[50,88],kn:[72,92],ft:[92,92]} },
+    cue:'Keeping the legs still, tilt both feet to the left, then to the right — like slow windscreen wipers.' },
 
   { id:'ankleRot', name:'Ankle Circles', sk:'Rotate both ways', cat:'mobility', mob:true, motion:'circle',
-    cue:'Draw slow circles with the feet — several times clockwise, then reverse and go anti-clockwise.',
-    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[42,62],elR:[58,62],haL:[44,72],haR:[56,72],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[46,100],knR:[54,100],ftL:[46,110],ftR:[54,110]},
-    side:{head:[50,30],neck:[50,42],sh:[50,48],el:[51,62],ha:[52,74],hip:[50,88],kn:[72,92],ft:[92,92]} },
+    cue:'Draw slow circles with the feet — several times clockwise, then reverse and go anti-clockwise.' },
 
   { id:'kneehug', name:'Knee Hug', sk:'Pawanmuktasana', cat:'warmup',
-    cue:'From the stretched-leg seat, hug one knee into the chest with both arms. Sit tall and breathe, then release and switch to the other leg.',
-    front:{head:[50,30],neck:[50,42],shL:[42,48],shR:[58,48],elL:[40,58],elR:[60,58],haL:[47,64],haR:[53,64],hipC:[50,88],hipL:[44,89],hipR:[56,89],knL:[42,66],knR:[58,100],ftL:[46,78],ftR:[62,110]},
-    side:{head:[50,30],neck:[50,42],sh:[50,48],el:[54,60],ha:[62,64],hip:[50,88],kn:[66,64],ft:[52,82]} },
+    cue:'From the stretched-leg seat, hug one knee into the chest with both arms. Sit tall and breathe, then release and switch to the other leg.' },
 
   { id:'reachup', name:'Kneeling Reach Up', sk:'Parvatasana', cat:'flow',
-    cue:'Kneeling tall, interlace the fingers and turn the palms to the sky. Press up, lengthen the spine, gaze forward.',
-    front:{head:[50,30],neck:[50,42],shL:[42,47],shR:[58,47],elL:[45,31],elR:[55,31],haL:[49,17],haR:[51,17],hipC:[50,84],hipL:[44,85],hipR:[56,85],knL:[40,100],knR:[60,100],ftL:[44,104],ftR:[56,104]},
-    side:{head:[52,30],neck:[50,42],sh:[49,47],el:[51,31],ha:[52,17],hip:[49,84],kn:[62,100],ft:[45,104]} },
+    cue:'Kneeling tall, interlace the fingers and turn the palms to the sky. Press up, lengthen the spine, gaze forward.' },
 ];
 
 /* =========================================================
-   Solid-silhouette figure renderer
-   Limbs are thick smooth strokes (Catmull-Rom curves through
-   the joints), the torso is a filled shape, the head a filled
-   circle — bold, readable-from-the-couch yoga-app figures.
+   Pose artwork — illustrated figures in art/<id>.webp
+   (sliced from a single AI-generated sheet so the character
+   and style are identical across every pose)
 ========================================================= */
-const FRONT_CHAINS=[['hipL','knL','ftL'],['hipR','knR','ftR'],['shL','elL','haL'],['shR','elR','haR']];
-const SIDE_CHAINS=[['hip','kn','ft'],['sh','el','ha']];
+POSES.forEach(p=>{ const im=new Image(); im.src=`art/${p.id}.webp`; }); // pre-warm the cache
 
-/* Catmull-Rom → cubic bezier smooth path through points */
-function smooth(P){
-  if(P.length<2) return '';
-  if(P.length===2) return `M${P[0][0]} ${P[0][1]} L${P[1][0]} ${P[1][1]}`;
-  let d=`M${P[0][0]} ${P[0][1]}`;
-  for(let i=0;i<P.length-1;i++){
-    const p0=P[Math.max(0,i-1)],p1=P[i],p2=P[i+1],p3=P[Math.min(P.length-1,i+2)];
-    const c1=[p1[0]+(p2[0]-p0[0])/6, p1[1]+(p2[1]-p0[1])/6];
-    const c2=[p2[0]-(p3[0]-p1[0])/6, p2[1]-(p3[1]-p1[1])/6];
-    d+=` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0]} ${p2[1]}`;
-  }
-  return d;
-}
-
-function figureSVG(pose, view){
-  const j=pose[view], front=view==='front';
-  const pts=ch=>ch.map(k=>j[k]);
-  let g='';
-  if(front){
-    g+=`<path class="torso" d="M${j.shL[0]} ${j.shL[1]} L${j.shR[0]} ${j.shR[1]} L${j.hipR[0]} ${j.hipR[1]} L${j.hipL[0]} ${j.hipL[1]} Z"/>`;
-  } else {
-    g+=`<path class="spine" d="${smooth([j.hip,j.neck])}"/>`;
-  }
-  for(const ch of (front?FRONT_CHAINS:SIDE_CHAINS)) g+=`<path class="limb" d="${smooth(pts(ch))}"/>`;
-  const h=j.head, r=7.8;
-  g+=`<line class="limb" x1="${j.neck[0]}" y1="${j.neck[1]}" x2="${h[0]}" y2="${h[1]}"/>`;
-  g+=`<circle class="headfill" cx="${h[0]}" cy="${h[1]}" r="${r}"/>`;
-  let glyph='';
-  if(pose.motion){
-    const ax = front ? (j.ftL[0]+j.ftR[0])/2 : j.ft[0];
-    const ay = (front ? (j.ftL[1]+j.ftR[1])/2 : j.ft[1]) - 3;
-    glyph = motionGlyph(pose.motion, ax, ay);
-  }
-  const mat=`<line class="mat" x1="8" y1="114" x2="92" y2="114"/>`;
-  return `<svg viewBox="-6 -6 112 134" xmlns="http://www.w3.org/2000/svg">${mat}${g}${glyph}</svg>`;
-}
-
-/* A small animated arrow that shows an active movement (used by the
-   mobility drills). Kept outside the sketch filter so it reads crisply. */
+/* A small animated arrow overlaid on the mobility drills to
+   show the movement direction. */
 function motionGlyph(type, cx, cy){
   const a=7;
   if(type==='updown'){
@@ -603,11 +522,11 @@ $('#homeBtn').onclick=()=>{ renderHome(); show('home'); };
 function buildDots(){ const d=$('#dots'); d.innerHTML=''; S.seq.forEach(()=>{const e=document.createElement('div');e.className='dot';d.appendChild(e);}); paintDots(); }
 function paintDots(){ [...$('#dots').children].forEach((e,i)=>{ e.className='dot'+(i<idx?' done':'')+(i===idx?' cur':''); }); }
 
-/* Single view per pose — whichever angle reads the pose most clearly */
-const BEST_VIEW={easy:'front',thunder:'side',sidebend:'front',staff:'side',butterfly:'front',twist:'front',cowface:'front',wideleg:'front',pigeon:'side',lunge:'side',catcow:'side',sphinx:'side',child:'side',meditate:'front',ankleFB:'side',ankleLR:'side',ankleRot:'side',kneehug:'front',reachup:'side'};
 function renderPose(p){
   $('#figs').innerHTML =
-    `<div class="fig">${figureSVG(p, BEST_VIEW[p.id]||'side')}</div>`;
+    `<div class="fig"><img src="art/${p.id}.webp" alt="${p.name}">`+
+    (p.motion?`<svg class="arrowov" viewBox="-1 -1 22 22">${motionGlyph(p.motion,10,10)}</svg>`:'')+
+    `<div class="matline"></div></div>`;
   $('#poseEn').textContent=p.name; $('#poseSk').textContent=p.sk;
   $('#cue').textContent=p.cue; $('#cue').classList.remove('trans');
   $('#poseCount').textContent=`Pose ${idx+1} / ${S.seq.length}`;
